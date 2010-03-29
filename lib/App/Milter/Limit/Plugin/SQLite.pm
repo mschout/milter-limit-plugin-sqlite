@@ -1,45 +1,6 @@
-=head1 NAME
-
-App::Milter::Limit::Plugin::SQLite - SQLite backend for App::Milter::Limit
-
-=head1 SYNOPSIS
-
- my $milter = App::Milter::Limit->instance('SQLite');
-
-=head1 DESCRIPTION
-
-This module implements the C<App::Milter::Limit> backend using a SQLite data
-store.
-
-=head1 CONFIGURATION
-
-The C<[driver]> section of the configuration file must specify the following items:
-
-=over 4
-
-=item home [optional]
-
-The directory where the database files should be stored.
-
-default: C<state_dir>
-
-=item file [optional]
-
-The database filename.
-
-default: C<stats.db>
-
-=item table [optional]
-
-Table name that will store the statistics.
-
-default: C<milter>
-
-=back
-
-=cut
-
 package App::Milter::Limit::Plugin::SQLite;
+
+# ABSTRACT: SQLite driver for App::Milter::Limit
 
 use strict;
 use base qw(App::Milter::Limit::Plugin Class::Accessor);
@@ -50,20 +11,29 @@ use App::Milter::Limit::Util;
 
 __PACKAGE__->mk_accessors(qw(_dbh table));
 
+=begin Pod::Coverage
+
+child_init
+child_exit
+
+=end Pod::Coverage
+
+=cut
+
 sub init {
     my $self = shift;
 
-    $self->init_defaults;
+    $self->_init_defaults;
 
     App::Milter::Limit::Util::make_path($self->config_get('driver', 'home'));
 
     $self->table( $self->config_get('driver', 'table') );
 
     # setup the database
-    $self->init_database;
+    $self->_init_database;
 }
 
-sub init_defaults {
+sub _init_defaults {
     my $self = shift;
 
     $self->config_defaults('driver',
@@ -71,6 +41,12 @@ sub init_defaults {
         file  => 'stats.db',
         table => 'milter');
 }
+
+=method db_file
+
+return the full path to the SQLite database filename
+
+=cut
 
 sub db_file {
     my $self = shift;
@@ -81,7 +57,7 @@ sub db_file {
     return File::Spec->catfile($home, $file);
 }
 
-sub new_dbh {
+sub _new_dbh {
     my $self = shift;
 
     # setup connection to the database.
@@ -95,14 +71,15 @@ sub new_dbh {
     return $dbh;
 }
 
-sub init_database {
+# initialize the database
+sub _init_database {
     my $self = shift;
 
     # setup connection to the database.
-    $self->_dbh($self->new_dbh);
+    $self->_dbh($self->_new_dbh);
 
-    unless ($self->table_exists($self->table)) {
-        $self->create_table($self->table);
+    unless ($self->_table_exists($self->table)) {
+        $self->_create_table($self->table);
     }
 
     # make sure the db file has the right owner.
@@ -120,7 +97,7 @@ sub child_init {
 
     if (my $dbh = $self->_dbh) {
         $dbh->disconnect;
-        $dbh = $self->new_dbh;
+        $dbh = $self->_new_dbh;
         $self->_dbh($dbh);
     }
 }
@@ -164,8 +141,8 @@ sub query {
     return $count + 1;
 }
 
-# return true if the given db table exists.
-sub table_exists {
+# return true if the given table exists in the db.
+sub _table_exists {
     my ($self, $table) = @_;
 
     $self->_dbh->do("select 1 from $table limit 0")
@@ -174,8 +151,8 @@ sub table_exists {
     return 1;
 }
 
-# create the given table as the stats table.
-sub create_table {
+# create the stats table
+sub _create_table {
     my ($self, $table) = @_;
 
     my $dbh = $self->_dbh;
@@ -253,35 +230,42 @@ sub _reset {
         or warn "failed to reset $sender: $DBI::errstr";
 }
 
-=head1 SOURCE
+1;
 
-You can contribute or fork this project via github:
+__END__
 
-http://github.com/mschout/milter-limit
+=head1 SYNOPSIS
 
- git clone git://github.com/mschout/milter-limit.git
+ my $milter = App::Milter::Limit->instance('SQLite');
 
-=head1 AUTHOR
+=head1 DESCRIPTION
 
-Michael Schout E<lt>mschout@cpan.orgE<gt>
+This module implements the C<App::Milter::Limit> backend using a SQLite data
+store.
 
-=head1 COPYRIGHT & LICENSE
+=head1 CONFIGURATION
 
-Copyright 2009 Michael Schout.
-
-This program is free software; you can redistribute it and/or modify it under
-the terms of either:
+The C<[driver]> section of the configuration file must specify the following items:
 
 =over 4
 
-=item *
+=item home [optional]
 
-the GNU General Public License as published by the Free Software Foundation;
-either version 1, or (at your option) any later version, or
+The directory where the database files should be stored.
 
-=item *
+default: C<state_dir>
 
-the Artistic License version 2.0.
+=item file [optional]
+
+The database filename.
+
+default: C<stats.db>
+
+=item table [optional]
+
+Table name that will store the statistics.
+
+default: C<milter>
 
 =back
 
@@ -289,7 +273,3 @@ the Artistic License version 2.0.
 
 L<App::Milter::Limit::Plugin>,
 L<App::Milter::Limit>
-
-=cut
-
-1;
