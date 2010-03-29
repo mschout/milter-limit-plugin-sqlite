@@ -1,4 +1,6 @@
 Revision history for App::Milter::Limit::Plugin::SQLite
 
 {{$NEXT}}
+
+0.50      2010-03-29 13:27:14 America/Chicago
     - initial release
