@@ -243,7 +243,7 @@ __END__
 
 =head1 DESCRIPTION
 
-This module implements the C<App::Milter::Limit> backend using a SQLite data
+This module implements the L<App::Milter::Limit> backend using a SQLite data
 store.
 
 =head1 CONFIGURATION
