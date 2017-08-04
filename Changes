@@ -1,7 +1,7 @@
 Revision history for App::Milter::Limit::Plugin::SQLite
 
 {{$NEXT}}
-    - add weaver.ini for Pod::Weaver
+    - Kwalitee: enable warnings
 
 0.51  2010-03-30
     - dzil: use my @MSCHOUT plugin bundle

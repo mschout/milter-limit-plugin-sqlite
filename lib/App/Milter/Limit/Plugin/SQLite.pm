@@ -3,6 +3,7 @@ package App::Milter::Limit::Plugin::SQLite;
 # ABSTRACT: SQLite driver for App::Milter::Limit
 
 use strict;
+use warnings;
 use base qw(App::Milter::Limit::Plugin Class::Accessor);
 use DBI;
 use File::Spec;
