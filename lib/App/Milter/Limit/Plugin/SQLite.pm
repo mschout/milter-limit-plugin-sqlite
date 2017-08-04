@@ -89,8 +89,10 @@ sub _init_database {
     my $uid = $self->config_get('global', 'user');
     my $gid = $self->config_get('global', 'group');
 
-    my $db_file = $self->db_file;
-    chown $uid, $gid, $db_file or die "chown($db_file): $!";
+    if (defined $uid and defined $gid) {
+        my $db_file = $self->db_file;
+        chown $uid, $gid, $db_file or die "chown($db_file): $!";
+    }
 }
 
 sub child_init {
