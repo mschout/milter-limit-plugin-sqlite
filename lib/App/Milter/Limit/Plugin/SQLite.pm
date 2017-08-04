@@ -1,3 +1,5 @@
+# COPYRIGHT
+
 package App::Milter::Limit::Plugin::SQLite;
 
 # ABSTRACT: SQLite driver for App::Milter::Limit
