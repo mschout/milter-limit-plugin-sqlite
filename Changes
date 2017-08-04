@@ -1,6 +1,8 @@
 Revision history for App::Milter::Limit::Plugin::SQLite
 
 {{$NEXT}}
+
+0.52  2017-08-04
     - Kwalitee: enable warnings
     - add a smoke test
     - don't attempt to chown the database file unless user and group are
